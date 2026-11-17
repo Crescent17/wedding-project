@@ -80,8 +80,8 @@
   }
   var loaded=new Promise(function(r){ document.readyState==='complete'?r():window.addEventListener('load',r); });
   var fonts=(document.fonts&&document.fonts.load)
-    ? Promise.race([document.fonts.load('48px "Passions Conflict RUS"'),new Promise(function(r){setTimeout(r,3000)})]).catch(function(){})
-    : Promise.resolve();
+      ? Promise.race([document.fonts.load('48px "Passions Conflict RUS"'),new Promise(function(r){setTimeout(r,3000)})]).catch(function(){})
+      : Promise.resolve();
   var minimum=new Promise(function(r){ setTimeout(r,1200); });
   Promise.all([loaded,fonts,minimum]).then(show);
   setTimeout(show,6000);
@@ -180,7 +180,7 @@
      На сенсорных устройствах и при prefers-reduced-motion остаётся нативный скролл. */
   (function(){
     if(!window.requestAnimationFrame || !window.scrollTo ||
-       window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     var current=window.scrollY, target=current, raf=0, lastTime=0, active=false;
     /* Меньший коэффициент даёт более мягкое, но всё ещё отзывчивое затухание. */
@@ -451,7 +451,7 @@
     var selectors='.invite,.timeline,.venue,.dress,.details,.rsvp,.contacts,.countdown,.swatches';
     var sections=document.querySelectorAll(selectors);
     if(!sections.length || !('IntersectionObserver' in window) ||
-       window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     sections.forEach(function(section,index){
       section.classList.add('reveal-on-scroll');
       if(index%4) section.classList.add('reveal-delay-'+(index%4));
@@ -509,43 +509,79 @@
   (function(){
     var timer=document.getElementById('timer'), button=document.getElementById('addToCalendar');
     if(!timer||!button) return;
-    button.addEventListener('click',function(){
+    var TITLE='Свадьба Никиты и Полины', PLACE='Усадьба Lake View Villa, деревня Казаки, 23';
+    var ua=navigator.userAgent||'';
+    var isIOS=/iPhone|iPad|iPod/i.test(ua), isAndroid=/Android/i.test(ua);
+    /* Встроенные браузеры (Telegram и др.) не умеют скачивать файлы и открывать intent://,
+       а в User-Agent часто не пишут своё имя, поэтому определяем и по косвенным признакам. */
+    var isInApp=/Telegram|FBAN|FBAV|Instagram|Line\//i.test(ua)||!!window.TelegramWebviewProxy||!!window.TelegramWebview||
+        (isIOS&&!/Safari/i.test(ua))||(isAndroid&&/;\s*wv\)/i.test(ua));
+
+    function icsDate(date){ return date.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z'); }
+    function getRange(){
       var start=new Date(timer.getAttribute('data-target'));
-      if(isNaN(start.getTime())) return;
-      var end=new Date(start.getTime()+4*60*60*1000);
-      function icsDate(date){ return date.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z'); }
-      var ics=[
-        'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Nikita and Polina//Wedding//RU',
-        'CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT',
-        'UID:wedding-nikita-polina-2027@invite','DTSTAMP:'+icsDate(new Date()),
-        'DTSTART:'+icsDate(start),'DTEND:'+icsDate(end),
-        'SUMMARY:Свадьба Никиты и Полины','LOCATION:Усадьба Lake View Villa, деревня Казаки, 23',
-        'DESCRIPTION:Свадьба Никиты и Полины','END:VEVENT','END:VCALENDAR'
-      ].join('\r\n');
-      var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'}), url=URL.createObjectURL(blob);
-      var userAgent=navigator.userAgent||'', isIOS=/iPhone|iPad|iPod/i.test(userAgent), isAndroid=/Android/i.test(userAgent), isTelegram=/Telegram/i.test(userAgent);
-      function downloadIcs(){
-        var link=document.createElement('a');
-        link.href=url;
-        link.download='svadba-nikity-i-poliny.ics';
-        link.rel='noopener';
-        document.body.appendChild(link);
-        link.click();
-        setTimeout(function(){ link.remove(); URL.revokeObjectURL(url); },1000);
+      if(isNaN(start.getTime())) return null;
+      return {start:start,end:new Date(start.getTime()+4*60*60*1000)};
+    }
+    function googleUrl(r){
+      return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(TITLE)+
+          '&dates='+icsDate(r.start)+'/'+icsDate(r.end)+'&location='+encodeURIComponent(PLACE)+'&details='+encodeURIComponent(TITLE);
+    }
+    function buildIcs(r){
+      return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Nikita and Polina//Wedding//RU','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT',
+        'UID:wedding-nikita-polina-2027@invite','DTSTAMP:'+icsDate(new Date()),'DTSTART:'+icsDate(r.start),'DTEND:'+icsDate(r.end),
+        'SUMMARY:'+TITLE,'LOCATION:'+PLACE,'DESCRIPTION:'+TITLE,'END:VEVENT','END:VCALENDAR'].join('\r\n');
+    }
+
+    /* Маленькая подсказка внизу экрана (вместо окна с кнопками) */
+    var toast=null, toastTimer=0;
+    function showToast(text){
+      if(!toast){
+        toast=document.createElement('div'); toast.className='cal-toast'; toast.setAttribute('role','status');
+        document.body.appendChild(toast);
       }
-      if(isTelegram){
-        window.location.href='assets/wedding.ics';
-      }else if(isIOS){
+      toast.textContent=text; toast.classList.add('is-visible');
+      clearTimeout(toastTimer);
+      toastTimer=setTimeout(function(){ toast.classList.remove('is-visible'); },7000);
+    }
+    /* Запасной путь: Google Календарь с уже заполненным событием */
+    function openGoogle(r,withHint){
+      window.open(googleUrl(r),'_blank','noopener,noreferrer');
+      if(withHint) showToast('Не открылось? Нажмите ⋮ вверху и выберите «Открыть в браузере»');
+    }
+    /* Внутри Telegram: системное меню «Поделиться» с файлом события (на iPhone там есть «Календарь») */
+    function shareIcs(r){
+      var file;
+      try{ file=new File([buildIcs(r)],'svadba-nikity-i-poliny.ics',{type:'text/calendar'}); }catch(e){ return false; }
+      if(!navigator.share||!navigator.canShare||!navigator.canShare({files:[file]})) return false;
+      navigator.share({files:[file],title:TITLE}).catch(function(err){
+        if(err&&err.name==='AbortError') return;
+        openGoogle(r,true);
+      });
+      return true;
+    }
+
+    button.addEventListener('click',function(){
+      var r=getRange();
+      if(!r) return;
+      if(isInApp){ if(!shareIcs(r)) openGoogle(r,true); return; }
+      if(isIOS){
+        var url=URL.createObjectURL(new Blob([buildIcs(r)],{type:'text/calendar;charset=utf-8'}));
         window.location.href=url;
+        setTimeout(function(){ URL.revokeObjectURL(url); },60000);
       }else if(isAndroid){
-        var title=encodeURIComponent('Свадьба Никиты и Полины'), location=encodeURIComponent('Усадьба Lake View Villa, деревня Казаки, 23');
-        var systemIntent='intent://com.android.calendar/events#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.item/event;S.title='+title+';S.eventLocation='+location+';S.description='+encodeURIComponent('Свадьба Никиты и Полины')+';l.beginTime='+start.getTime()+';l.endTime='+end.getTime()+';end';
-        window.location.href=systemIntent;
+        var intent='intent://com.android.calendar/events#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.item/event;S.title='+encodeURIComponent(TITLE)+
+            ';S.eventLocation='+encodeURIComponent(PLACE)+';S.description='+encodeURIComponent(TITLE)+';l.beginTime='+r.start.getTime()+';l.endTime='+r.end.getTime()+';end';
+        var left=false, onLeave=function(){ left=true; };
+        document.addEventListener('visibilitychange',onLeave); window.addEventListener('pagehide',onLeave); window.addEventListener('blur',onLeave);
+        window.location.href=intent;
+        /* если приложение календаря не открылось — показываем запасные варианты */
+        setTimeout(function(){
+          document.removeEventListener('visibilitychange',onLeave); window.removeEventListener('pagehide',onLeave); window.removeEventListener('blur',onLeave);
+          if(!left&&document.visibilityState==='visible') openGoogle(r,false);
+        },1500);
       }else{
-        var dates=start.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z')+'/'+end.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z');
-        var title=encodeURIComponent('Свадьба Никиты и Полины'), location=encodeURIComponent('Усадьба Lake View Villa, деревня Казаки, 23');
-        window.open('https://calendar.google.com/calendar/r/eventedit?text='+title+'&dates='+dates+'&location='+location+'&details='+encodeURIComponent('Свадьба Никиты и Полины'),'_blank','noopener,noreferrer');
-        URL.revokeObjectURL(url);
+        window.open(googleUrl(r),'_blank','noopener,noreferrer');
       }
     });
   })();
