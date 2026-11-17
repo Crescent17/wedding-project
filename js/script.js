@@ -12,7 +12,7 @@
     var ambient=document.getElementById('ambientBg');
     if(!ambient || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     var colors=['#777b56','#c9a87c','#a98f70'];
-    for(var i=0;i<5;i++){
+    for(var i=0;i<3;i++){
       var heart=document.createElement('i');
       heart.className='ambient-heart';
       heart.textContent='\u2665';
@@ -41,7 +41,7 @@
     var lastScroll=window.scrollY, lastScatterAt=0, scatterQueued=false;
     function scatter(){
       scatterQueued=false;
-      if(Math.abs(window.scrollY-lastScroll)<6 || Date.now()-lastScatterAt<120) return;
+      if(Math.abs(window.scrollY-lastScroll)<12 || Date.now()-lastScatterAt<240) return;
       lastScroll=window.scrollY;
       lastScatterAt=Date.now();
       var count=1;
