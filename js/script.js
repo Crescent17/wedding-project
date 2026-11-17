@@ -513,15 +513,23 @@
       var start=new Date(timer.getAttribute('data-target'));
       if(isNaN(start.getTime())) return;
       var end=new Date(start.getTime()+4*60*60*1000);
-      var dates=start.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z')+'/'+end.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z');
-      var title=encodeURIComponent('Свадьба Никиты и Полины'), location=encodeURIComponent('Усадьба Lake View Villa, деревня Казаки, 23');
-      var url='https://calendar.google.com/calendar/r/eventedit?text='+title+'&dates='+dates+'&location='+location+'&details='+encodeURIComponent('Свадьба Никиты и Полины');
-      var userAgent=navigator.userAgent||'', isAndroid=/Android/i.test(userAgent);
-      if(isAndroid){
-        var intent='intent://calendar.google.com/calendar/r/eventedit?text='+title+'&dates='+dates+'&location='+location+'&details='+encodeURIComponent('Свадьба Никиты и Полины')+'#Intent;scheme=https;package=com.google.android.calendar;S.browser_fallback_url='+encodeURIComponent(url)+';end';
-        window.location.href=intent;
-      }else{
+      function icsDate(date){ return date.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z'); }
+      var ics=[
+        'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Nikita and Polina//Wedding//RU',
+        'CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT',
+        'UID:wedding-nikita-polina-2027@invite','DTSTAMP:'+icsDate(new Date()),
+        'DTSTART:'+icsDate(start),'DTEND:'+icsDate(end),
+        'SUMMARY:Свадьба Никиты и Полины','LOCATION:Усадьба Lake View Villa, деревня Казаки, 23',
+        'DESCRIPTION:Свадьба Никиты и Полины','END:VEVENT','END:VCALENDAR'
+      ].join('\r\n');
+      var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'}), url=URL.createObjectURL(blob);
+      var isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent||'');
+      if(isIOS){
         window.location.href=url;
+      }else{
+        var link=document.createElement('a');
+        link.href=url; link.download='wedding-nikita-polina.ics'; link.click();
+        setTimeout(function(){ URL.revokeObjectURL(url); },1000);
       }
     });
   })();
