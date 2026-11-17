@@ -289,3 +289,8 @@ body.lightbox-open{overflow:hidden}
   .ambient-bg::before,.ambient-bg::after,.ambient-heart,.ambient-scroll-heart{animation:none}
   .opening-heart{display:none}
 }
+
+@media (max-width:440px){
+  .calendar-btn{min-height:40px;padding:9px 15px;font-size:11px;white-space:nowrap}
+  .calendar-icon{width:15px;height:15px;margin-right:6px}
+}
