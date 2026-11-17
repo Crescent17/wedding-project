@@ -238,15 +238,6 @@ body.lightbox-open{overflow:hidden}
 .t-unit{display:flex;flex-direction:column;align-items:center}
 .t-num{font-size:calc(min(100vw,440px)*.1);font-weight:300;line-height:1.15;font-variant-numeric:tabular-nums}
 .t-label{font-size:calc(min(100vw,440px)*.03);line-height:1.3}
-.calendar-btn{position:absolute;left:50%;bottom:10%;z-index:2;display:inline-flex;align-items:center;justify-content:center;min-height:42px;margin:0;padding:10px 18px;border:1px solid rgba(255,255,255,.9);border-radius:999px;background:rgba(58,42,34,.42);box-shadow:0 4px 16px rgba(35,24,16,.22);color:#fff;font:500 12px/1.25 Montserrat,Arial,sans-serif;letter-spacing:.04em;cursor:pointer;backdrop-filter:blur(5px);transform:translateX(-50%);transition:background-color .25s ease,transform .25s ease,border-color .25s ease,box-shadow .25s ease}
-.calendar-icon{width:16px;height:16px;margin-right:7px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
-.calendar-btn:hover{background:rgba(58,42,34,.62);border-color:#fff;box-shadow:0 7px 20px rgba(35,24,16,.3);transform:translateX(-50%) translateY(-2px)}
-.calendar-btn:focus-visible{outline:2px solid #fff;outline-offset:4px}
-.calendar-btn.is-added{background:rgba(119,123,86,.8);border-color:#fff}
-
-/* ---------- Calendar hint toast ---------- */
-.cal-toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:200;box-sizing:border-box;width:min(360px,calc(100vw - 32px));padding:12px 16px;border-radius:14px;background:rgba(58,42,34,.94);color:#fff;font:400 13px/1.45 Montserrat,Arial,sans-serif;text-align:center;box-shadow:0 8px 24px rgba(35,24,16,.3);opacity:0;pointer-events:none;transform:translate(-50%,16px);transition:opacity .3s ease,transform .3s ease}
-.cal-toast.is-visible{opacity:1;transform:translate(-50%,0)}
 
 /* ---------- Larger headings ---------- */
 .flap-top h1{font-size:calc(var(--w)*.125)}
@@ -277,9 +268,6 @@ body.lightbox-open{overflow:hidden}
   .swatches.is-visible .swatch:nth-child(3){animation-delay:.6s}
   .swatches.is-visible .swatch:nth-child(4){animation-delay:.8s}
   @keyframes swatch-appear{from{opacity:0;transform:translateX(-22px) scale(.82)}to{opacity:1;transform:translateX(0) scale(1)}}
-  .countdown.reveal-on-scroll:not(.is-visible) .calendar-btn{opacity:0;transform:translateX(-50%) translateY(24px) scale(.9)}
-  .countdown.is-visible .calendar-btn{animation:calendar-button-appear .8s cubic-bezier(.2,.75,.2,1) .25s both}
-  @keyframes calendar-button-appear{from{opacity:0;transform:translateX(-50%) translateY(24px) scale(.9)}to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
 }
 
 /* ---------- RSVP celebration ---------- */
@@ -298,6 +286,4 @@ body.lightbox-open{overflow:hidden}
 }
 
 @media (max-width:440px){
-  .calendar-btn{min-height:40px;padding:9px 15px;font-size:11px;white-space:nowrap}
-  .calendar-icon{width:15px;height:15px;margin-right:6px}
 }

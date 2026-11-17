@@ -505,7 +505,7 @@
     tick();
     setInterval(tick,1000);
   })();
-  /* ---- Add wedding date to calendar ---- */
+  return;
   (function(){
     var timer=document.getElementById('timer'), button=document.getElementById('addToCalendar');
     if(!timer||!button) return;
