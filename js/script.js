@@ -516,7 +516,13 @@
       var dates=start.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z')+'/'+end.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z');
       var title=encodeURIComponent('Свадьба Никиты и Полины'), location=encodeURIComponent('Усадьба Lake View Villa, деревня Казаки, 23');
       var url='https://calendar.google.com/calendar/r/eventedit?text='+title+'&dates='+dates+'&location='+location+'&details='+encodeURIComponent('Свадьба Никиты и Полины');
-      window.location.href=url;
+      var userAgent=navigator.userAgent||'', isAndroid=/Android/i.test(userAgent);
+      if(isAndroid){
+        var intent='intent://calendar.google.com/calendar/r/eventedit?text='+title+'&dates='+dates+'&location='+location+'&details='+encodeURIComponent('Свадьба Никиты и Полины')+'#Intent;scheme=https;package=com.google.android.calendar;S.browser_fallback_url='+encodeURIComponent(url)+';end';
+        window.location.href=intent;
+      }else{
+        window.location.href=url;
+      }
     });
   })();
 })();
