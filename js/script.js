@@ -12,7 +12,7 @@
     var ambient=document.getElementById('ambientBg');
     if(!ambient || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     var colors=['#777b56','#c9a87c','#a98f70'];
-    for(var i=0;i<9;i++){
+    for(var i=0;i<5;i++){
       var heart=document.createElement('i');
       heart.className='ambient-heart';
       heart.textContent='\u2665';
@@ -44,7 +44,7 @@
       if(Math.abs(window.scrollY-lastScroll)<6 || Date.now()-lastScatterAt<120) return;
       lastScroll=window.scrollY;
       lastScatterAt=Date.now();
-      var count=2+Math.floor(Math.random()*2);
+      var count=1;
       for(var j=0;j<count;j++){
         var flying=document.createElement('i');
         flying.className='ambient-scroll-heart';
@@ -107,27 +107,29 @@
   });
 
   var opened=false;
-  function releasePetals(){
+  function releaseOpeningHearts(){
     if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     var colors=['#777b56','#c9a87c','#fceebd','#dacdbd'];
-    for(var i=0;i<24;i++){
-      var petal=document.createElement('i');
-      petal.className='opening-petal';
-      petal.style.setProperty('--petal-x',((Math.random()-.5)*Math.min(window.innerWidth*.95,520))+'px');
-      petal.style.setProperty('--petal-y',((Math.random()-.5)*Math.min(window.innerHeight*.9,700))+'px');
-      petal.style.setProperty('--petal-rotate',((Math.random()-.5)*720)+'deg');
-      petal.style.setProperty('--petal-scale',(0.7+Math.random()*.9).toFixed(2));
-      petal.style.setProperty('--petal-duration',(1.2+Math.random()*.8)+'s');
-      petal.style.setProperty('--petal-delay',(Math.random()*.18)+'s');
-      petal.style.setProperty('--petal-color',colors[i%colors.length]);
-      document.body.appendChild(petal);
-      setTimeout(function(node){ return function(){ node.remove(); }; }(petal),2300);
+    for(var i=0;i<14;i++){
+      var heart=document.createElement('i');
+      heart.className='opening-heart';
+      heart.textContent='\u2665';
+      heart.style.setProperty('--heart-x',((Math.random()-.5)*Math.min(window.innerWidth*.95,520))+'px');
+      heart.style.setProperty('--heart-y',((Math.random()-.5)*Math.min(window.innerHeight*.9,700))+'px');
+      heart.style.setProperty('--heart-rotate',((Math.random()-.5)*720)+'deg');
+      heart.style.setProperty('--heart-scale',(0.7+Math.random()*.9).toFixed(2));
+      heart.style.setProperty('--heart-size',(13+Math.random()*17)+'px');
+      heart.style.setProperty('--heart-duration',(1.2+Math.random()*.8)+'s');
+      heart.style.setProperty('--heart-delay',(Math.random()*.18)+'s');
+      heart.style.setProperty('--heart-color',colors[i%colors.length]);
+      document.body.appendChild(heart);
+      setTimeout(function(node){ return function(){ node.remove(); }; }(heart),2300);
     }
   }
   seal.addEventListener('click',function(){
     if(opened) return; opened=true;
     startMusic(); /* запуск прямо по клику — так браузеры разрешают звук */
-    releasePetals();
+    releaseOpeningHearts();
     stage.classList.add('opening');
     body.classList.add('opening');
     setTimeout(function(){

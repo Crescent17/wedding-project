@@ -14,8 +14,8 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:Montserrat,Ar
 @keyframes heart-float{0%{opacity:0;transform:translate3d(0,0,0) rotate(-12deg) scale(.75)}12%{opacity:.62}50%{opacity:.38;transform:translate3d(var(--heart-sway),-48vh,0) rotate(10deg) scale(1)}88%{opacity:.16}100%{opacity:0;transform:translate3d(calc(var(--heart-sway) * -1),-108vh,0) rotate(-8deg) scale(.9)}}
 .ambient-scroll-heart{position:absolute;left:var(--scroll-heart-left);top:var(--scroll-heart-top);color:var(--heart-color);font-family:Arial,sans-serif;font-size:var(--heart-size);line-height:1;opacity:0;filter:drop-shadow(0 2px 5px rgba(58,42,34,.18));text-shadow:0 0 8px rgba(255,255,255,.28);animation:heart-scatter var(--heart-duration) cubic-bezier(.2,.7,.3,1) forwards;will-change:transform,opacity}
 @keyframes heart-scatter{0%{opacity:0;transform:translate3d(0,16px,0) rotate(0) scale(.45)}18%{opacity:var(--heart-opacity)}100%{opacity:0;transform:translate3d(var(--scatter-x),var(--scatter-y),0) rotate(var(--scatter-rotate)) scale(var(--heart-scale))}}
-.opening-petal{position:fixed;left:50%;top:50%;z-index:25;width:9px;height:15px;border-radius:70% 30% 70% 30%;background:var(--petal-color);opacity:0;pointer-events:none;animation:petal-burst var(--petal-duration) cubic-bezier(.2,.7,.25,1) var(--petal-delay) forwards;will-change:transform,opacity}
-@keyframes petal-burst{0%{opacity:0;transform:translate3d(-50%,-50%,0) rotate(0) scale(.3)}12%{opacity:.9}75%{opacity:.75}100%{opacity:0;transform:translate3d(calc(-50% + var(--petal-x)),calc(-50% + var(--petal-y)),0) rotate(var(--petal-rotate)) scale(var(--petal-scale))}}
+.opening-heart{position:fixed;left:50%;top:50%;z-index:25;color:var(--heart-color);font-family:Arial,sans-serif;font-size:var(--heart-size);line-height:1;opacity:0;pointer-events:none;text-shadow:0 0 8px rgba(255,255,255,.35);animation:opening-heart-burst var(--heart-duration) cubic-bezier(.2,.7,.25,1) var(--heart-delay) forwards;will-change:transform,opacity}
+@keyframes opening-heart-burst{0%{opacity:0;transform:translate3d(-50%,-50%,0) scale(.25)}12%{opacity:.9}75%{opacity:.78}100%{opacity:0;transform:translate3d(calc(-50% + var(--heart-x)),calc(-50% + var(--heart-y)),0) rotate(var(--heart-rotate)) scale(var(--heart-scale))}}
 html::-webkit-scrollbar{width:10px}
 html::-webkit-scrollbar-track{background:var(--paper)}
 html::-webkit-scrollbar-thumb{background:var(--olive);border:2px solid var(--paper);border-radius:999px}
@@ -273,5 +273,5 @@ body.lightbox-open{overflow:hidden}
   .reveal-on-scroll{opacity:1!important;transform:none!important}
   .confetti-piece{display:none}
   .ambient-bg::before,.ambient-bg::after,.ambient-heart,.ambient-scroll-heart{animation:none}
-  .opening-petal{display:none}
+  .opening-heart{display:none}
 }
