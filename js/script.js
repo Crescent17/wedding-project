@@ -80,8 +80,8 @@
   }
   var loaded=new Promise(function(r){ document.readyState==='complete'?r():window.addEventListener('load',r); });
   var fonts=(document.fonts&&document.fonts.load)
-      ? Promise.race([document.fonts.load('48px "Passions Conflict RUS"'),new Promise(function(r){setTimeout(r,3000)})]).catch(function(){})
-      : Promise.resolve();
+    ? Promise.race([document.fonts.load('48px "Passions Conflict RUS"'),new Promise(function(r){setTimeout(r,3000)})]).catch(function(){})
+    : Promise.resolve();
   var minimum=new Promise(function(r){ setTimeout(r,1200); });
   Promise.all([loaded,fonts,minimum]).then(show);
   setTimeout(show,6000);
@@ -180,7 +180,7 @@
      На сенсорных устройствах и при prefers-reduced-motion остаётся нативный скролл. */
   (function(){
     if(!window.requestAnimationFrame || !window.scrollTo ||
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+       window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     var current=window.scrollY, target=current, raf=0, lastTime=0, active=false;
     /* Меньший коэффициент даёт более мягкое, но всё ещё отзывчивое затухание. */
@@ -451,7 +451,7 @@
     var selectors='.invite,.timeline,.venue,.dress,.details,.rsvp,.contacts,.countdown,.swatches';
     var sections=document.querySelectorAll(selectors);
     if(!sections.length || !('IntersectionObserver' in window) ||
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+       window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     sections.forEach(function(section,index){
       section.classList.add('reveal-on-scroll');
       if(index%4) section.classList.add('reveal-delay-'+(index%4));
@@ -515,7 +515,7 @@
     /* Встроенные браузеры (Telegram и др.) не умеют скачивать файлы и открывать intent://,
        а в User-Agent часто не пишут своё имя, поэтому определяем и по косвенным признакам. */
     var isInApp=/Telegram|FBAN|FBAV|Instagram|Line\//i.test(ua)||!!window.TelegramWebviewProxy||!!window.TelegramWebview||
-        (isIOS&&!/Safari/i.test(ua))||(isAndroid&&/;\s*wv\)/i.test(ua));
+      (isIOS&&!/Safari/i.test(ua))||(isAndroid&&/;\s*wv\)/i.test(ua));
 
     function icsDate(date){ return date.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z'); }
     function getRange(){
@@ -525,7 +525,7 @@
     }
     function googleUrl(r){
       return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(TITLE)+
-          '&dates='+icsDate(r.start)+'/'+icsDate(r.end)+'&location='+encodeURIComponent(PLACE)+'&details='+encodeURIComponent(TITLE);
+        '&dates='+icsDate(r.start)+'/'+icsDate(r.end)+'&location='+encodeURIComponent(PLACE)+'&details='+encodeURIComponent(TITLE);
     }
     function buildIcs(r){
       return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Nikita and Polina//Wedding//RU','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT',
@@ -549,6 +549,16 @@
       window.open(googleUrl(r),'_blank','noopener,noreferrer');
       if(withHint) showToast('Не открылось? Нажмите ⋮ вверху и выберите «Открыть в браузере»');
     }
+    /* iPhone внутри Telegram: webcal:// сразу открывает приложение «Календарь» с предложением добавить событие */
+    function openWebcal(){
+      var left=false, onLeave=function(){ left=true; };
+      document.addEventListener('visibilitychange',onLeave); window.addEventListener('pagehide',onLeave); window.addEventListener('blur',onLeave);
+      window.location.href='webcal://'+location.host+location.pathname.replace(/[^\/]*$/,'')+'assets/wedding.ics';
+      setTimeout(function(){
+        document.removeEventListener('visibilitychange',onLeave); window.removeEventListener('pagehide',onLeave); window.removeEventListener('blur',onLeave);
+        if(!left&&document.visibilityState==='visible') showToast('Не открылось? Нажмите ⋮ вверху и выберите «Открыть в браузере» — там календарь откроется сразу');
+      },1800);
+    }
     /* Внутри Telegram: системное меню «Поделиться» с файлом события (на iPhone там есть «Календарь») */
     function shareIcs(r){
       var file;
@@ -564,14 +574,14 @@
     button.addEventListener('click',function(){
       var r=getRange();
       if(!r) return;
-      if(isInApp){ if(!shareIcs(r)) openGoogle(r,true); return; }
+      if(isInApp){ if(isIOS) openWebcal(); else if(!shareIcs(r)) openGoogle(r,true); return; }
       if(isIOS){
         var url=URL.createObjectURL(new Blob([buildIcs(r)],{type:'text/calendar;charset=utf-8'}));
         window.location.href=url;
         setTimeout(function(){ URL.revokeObjectURL(url); },60000);
       }else if(isAndroid){
         var intent='intent://com.android.calendar/events#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.item/event;S.title='+encodeURIComponent(TITLE)+
-            ';S.eventLocation='+encodeURIComponent(PLACE)+';S.description='+encodeURIComponent(TITLE)+';l.beginTime='+r.start.getTime()+';l.endTime='+r.end.getTime()+';end';
+          ';S.eventLocation='+encodeURIComponent(PLACE)+';S.description='+encodeURIComponent(TITLE)+';l.beginTime='+r.start.getTime()+';l.endTime='+r.end.getTime()+';end';
         var left=false, onLeave=function(){ left=true; };
         document.addEventListener('visibilitychange',onLeave); window.addEventListener('pagehide',onLeave); window.addEventListener('blur',onLeave);
         window.location.href=intent;
