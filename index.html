@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Приглашение на свадьбу</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="loader" role="status" aria-label="Загрузка">
+  <div class="spinner" aria-hidden="true">
+    <i style="--a:200deg;--s:14px"></i><i style="--a:162deg;--s:10px"></i><i style="--a:128deg;--s:8px"></i><i style="--a:98deg;--s:6px"></i><i style="--a:72deg;--s:4px"></i>
+  </div>
+</div>
+
+<div id="stage">
+  <div class="flap flap-top">
+    <img src="assets/flap-top.webp" alt="">
+    <h1>Приглашение<br>на свадьбу</h1>
+  </div>
+  <div class="flap flap-bottom">
+    <img src="assets/flap-bottom.webp" alt="">
+  </div>
+  <button class="seal" id="seal" type="button" aria-label="Открыть приглашение">
+    <img src="assets/seal.webp" alt="">
+  </button>
+</div>
+
+<main id="main" tabindex="-1">
+  <div class="page">
+    <section class="hero">
+      <img class="hero-photo" src="assets/hero.webp" alt="Никита и Полина">
+      <div class="hero-text">
+        <h2 class="names">Nikita &amp; Polina</h2>
+        <p class="date">20/06</p>
+      </div>
+    </section>
+
+    <div class="music">
+      <img class="music-ring" src="assets/icons/music-ring.svg" alt="">
+      <button id="musicBtn" class="music-btn" type="button" aria-pressed="false" aria-label="Включить музыку">
+        <img class="icon-play" src="assets/icons/play.svg" alt="">
+        <img class="icon-stop" src="assets/icons/stop.svg" alt="">
+      </button>
+    </div>
+
+    <section class="invite">
+      <h2 class="invite-title">Дорогие родные и друзья!</h2>
+      <p class="invite-text">В нашей жизни наступает особенный момент — день, когда мы станем семьёй! Мы будем счастливы разделить с вами радость этого незабываемого события.</p>
+
+      <div class="calendar" role="img" aria-label="20 июня, воскресенье">
+        <div class="cal-cell">
+          <span class="cal-day">суббота</span>
+          <span class="cal-month">июня</span>
+          <span class="cal-num">19</span>
+        </div>
+        <div class="cal-cell is-main">
+          <span class="cal-day">воскресенье</span>
+          <span class="cal-month">июня</span>
+          <span class="cal-num">20</span>
+          <img class="cal-circle" src="assets/date-circle.svg" alt="">
+        </div>
+        <div class="cal-cell">
+          <span class="cal-day">понедельник</span>
+          <span class="cal-month">июня</span>
+          <span class="cal-num">21</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="timeline" aria-label="Программа дня">
+      <div class="tl-line" id="tlLine">
+        <svg class="tl-svg" viewBox="0 0 300 1378.53" aria-hidden="true">
+          <path id="tlPath" d="M160.2404 0.7446C143.0498 130.3245 275.5576 133.8347 262.9866 233.3739C247.2478 357.9947 31.2581 334.0184 31.2572 462.9924C31.2563 591.9655 274.3348 573.6124 281.228 707.4962C288.1212 841.376 112.3066 807.0884 31.2572 892.7164C-59.6853 988.7943 77.4536 1042.7108 177.211 1078.8888C255.9866 1107.4529 298.7455 1152.4594 298.7407 1206.9954C298.7358 1260.9689 250.0732 1309.9371 163.3716 1377.3123" fill="none" stroke="#777b56" stroke-width="1.6" vector-effect="non-scaling-stroke"/>
+        </svg>
+        <div class="tl-item" style="--x:59;--y:248">
+          <span class="tl-name">Welcome</span>
+          <span class="tl-time">17:00</span>
+        </div>
+        <div class="tl-item" style="--x:326;--y:495">
+          <span class="tl-name">Церемония</span>
+          <span class="tl-time">17:30</span>
+        </div>
+        <div class="tl-item" style="--x:44;--y:737">
+          <span class="tl-name">Начало банкета</span>
+          <span class="tl-time">18:00</span>
+        </div>
+        <div class="tl-item" style="--x:238;--y:980">
+          <span class="tl-name">Торт</span>
+          <span class="tl-time">22:00</span>
+        </div>
+        <div class="tl-item" style="--x:155;--y:1226">
+          <span class="tl-name">Финал</span>
+          <span class="tl-time">23:00</span>
+        </div>
+        <img class="tl-heart" id="tlHeart" src="assets/heart.svg" alt="">
+      </div>
+    </section>
+
+    <section class="venue">
+      <h2 class="venue-title">Место проведения</h2>
+      <p class="venue-address">Усадьба Lake View Villa<br>деревня Казаки, 23</p>
+      <a class="round-btn" href="https://yandex.by/maps/org/lake_view_villa/16987605843/?ll=27.145537%2C53.967142&amp;z=16.84" target="_blank" rel="noopener noreferrer">Построить<br>маршрут</a>
+      <img class="venue-photo" src="assets/venue.webp" alt="Усадьба Lake View Villa на закате">
+    </section>
+
+    <section class="dress">
+      <h2 class="dress-title">Дресс-код</h2>
+      <p class="dress-text">Мы будем очень благодарны, если вы поддержите цветовую палитру нашей свадьбы.</p>
+      <div class="swatches" role="img" aria-label="Цветовая палитра: тёмно-коричневый, бежевый, светло-жёлтый, шалфейно-зелёный">
+        <span style="background:#533b2f"></span>
+        <span style="background:#dacdbd"></span>
+        <span style="background:#fceebd"></span>
+        <span style="background:#99a287"></span>
+      </div>
+    </section>
+
+    <section class="details">
+      <img class="details-bg" src="assets/details.webp" alt="" aria-hidden="true">
+      <h2 class="details-title">Details</h2>
+      <p>Лучший подарок — ваши эмоции. Если хочется сделать нам сюрприз, конверт станет отличным помощником в исполнении наших мечт.</p>
+      <p>Мы бы хотели, чтобы в день нашей свадьбы вы вдоволь повеселились и отдохнули, поэтому мы решили устроить праздник исключительно для совершеннолетних гостей.</p>
+      <p>Будем признательны за альтернативу букетам в форме бутылочки алкогольного напитка и записки о событии, к которому приурочить ее открытие.</p>
+    </section>
+
+    <section class="rsvp">
+      <h2 class="rsvp-title">Анкета</h2>
+      <p class="rsvp-lead">Подтвердите своё присутствие</p>
+
+      <form class="rsvp-form" id="rsvpForm" name="rsvp" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+        <input type="hidden" name="form-name" value="rsvp">
+        <p hidden><label>Не заполняйте это поле: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+
+        <div class="field">
+          <label class="q" for="guestName">Ваше имя и фамилия</label>
+          <input class="text-input" id="guestName" name="name" type="text" placeholder="Иван Иванов" autocomplete="name" required>
+        </div>
+
+        <fieldset class="field">
+          <legend class="q">Получится ли у вас присутствовать?</legend>
+          <label class="opt"><input type="radio" name="attendance" value="Да" required><span>Да</span></label>
+          <label class="opt"><input type="radio" name="attendance" value="Нет"><span>Нет</span></label>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend class="q">Что предпочитаете из алкоголя?</legend>
+          <label class="opt"><input type="checkbox" name="alcohol" value="Шампанское"><span>Шампанское</span></label>
+          <label class="opt"><input type="checkbox" name="alcohol" value="Вино белое"><span>Вино белое</span></label>
+          <label class="opt"><input type="checkbox" name="alcohol" value="Вино красное"><span>Вино красное</span></label>
+          <label class="opt"><input type="checkbox" name="alcohol" value="Коньяк/Виски"><span>Коньяк/Виски</span></label>
+          <label class="opt"><input type="checkbox" name="alcohol" value="Водка"><span>Водка</span></label>
+          <label class="opt"><input type="checkbox" name="alcohol" value="Безалкогольные напитки"><span>Безалкогольные напитки</span></label>
+        </fieldset>
+
+        <button class="rsvp-btn" type="submit">Отправить</button>
+        <p class="form-status" id="rsvpStatus" role="status" aria-live="polite"></p>
+      </form>
+
+      <p class="form-done" id="rsvpDone" role="status" hidden>Спасибо! Мы получили ваш ответ.</p>
+    </section>
+
+    <section class="contacts">
+      <h2 class="contacts-title">Контакты</h2>
+      <p class="contacts-text">В случае возникновения вопросов обращайтесь к нашему свадебному организатору — Ольге<br><a class="contacts-phone" href="tel:+375296557995">+375 29 655 7995</a></p>
+      <a class="round-btn" href="tel:+375296557995">Позвонить</a>
+    </section>
+
+    <section class="countdown" aria-label="Обратный отсчёт до свадьбы">
+      <img class="countdown-bg" src="assets/countdown.webp" alt="" aria-hidden="true">
+      <h2 class="countdown-title">До встречи через:</h2>
+      <div class="timer" id="timer" role="timer" data-target="2027-06-20T14:00:00+03:00">
+        <div class="t-unit"><span class="t-num" data-num="days">00</span><span class="t-label" data-label="days">дней</span></div>
+        <div class="t-unit"><span class="t-num" data-num="hours">00</span><span class="t-label" data-label="hours">часов</span></div>
+        <div class="t-unit"><span class="t-num" data-num="minutes">00</span><span class="t-label" data-label="minutes">минут</span></div>
+        <div class="t-unit"><span class="t-num" data-num="seconds">00</span><span class="t-label" data-label="seconds">секунд</span></div>
+      </div>
+    </section>
+  </div>
+  <audio id="music" src="assets/audio/shape-of-my-heart.mp3" loop preload="auto"></audio>
+</main>
+
+<script src="js/script.js"></script>
+</body>
+</html>
