@@ -91,6 +91,84 @@
     update(true);
     window.__updateHeart=update;
   })();
+  /* ---- Инерционная прокрутка колесом мыши ----
+     Целевая позиция меняется сразу, а фактическая догоняет её через LERP.
+     На сенсорных устройствах и при prefers-reduced-motion остаётся нативный скролл. */
+  (function(){
+    if(!window.requestAnimationFrame || !window.scrollTo ||
+       window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var current=window.scrollY, target=current, raf=0, lastTime=0, active=false;
+    /* Меньший коэффициент даёт более мягкое, но всё ещё отзывчивое затухание. */
+    var LERP=0.1, STOP_EPSILON=0.35;
+
+    function maxScroll(){
+      return Math.max(0, document.documentElement.scrollHeight-window.innerHeight);
+    }
+    function clamp(value){ return Math.max(0,Math.min(maxScroll(),value)); }
+    function frame(time){
+      if(!lastTime) lastTime=time;
+      /* Корректируем коэффициент для мониторов с разной частотой обновления. */
+      var alpha=1-Math.pow(1-LERP,Math.min(3,(time-lastTime)/16.67));
+      lastTime=time;
+      current+=(target-current)*alpha;
+      if(Math.abs(target-current)<=STOP_EPSILON){
+        current=target;
+        window.scrollTo(0,current);
+        raf=0; active=false; lastTime=0;
+        return;
+      }
+      window.scrollTo(0,current);
+      raf=requestAnimationFrame(frame);
+    }
+    function start(){
+      if(raf) return;
+      active=true;
+      raf=requestAnimationFrame(frame);
+    }
+    function onWheel(event){
+      if(root.classList.contains('locked') || event.ctrlKey || !event.deltaY) return;
+      event.preventDefault();
+      if(!active){
+        current=window.scrollY;
+        target=current;
+      }
+      var multiplier=event.deltaMode===1 ? 16 : event.deltaMode===2 ? window.innerHeight : 1;
+      target=clamp(target+event.deltaY*multiplier);
+      start();
+    }
+    function isEditable(element){
+      return element && (element.isContentEditable || /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(element.tagName));
+    }
+    function onKeydown(event){
+      if(root.classList.contains('locked') || event.ctrlKey || event.altKey || event.metaKey || isEditable(document.activeElement)) return;
+
+      if(!active){
+        current=window.scrollY;
+        target=current;
+      }
+      var step=Math.max(120,window.innerHeight*0.14), distance=0;
+      switch(event.key){
+        case 'ArrowDown': distance=step; break;
+        case 'ArrowUp': distance=-step; break;
+        case 'PageDown': distance=window.innerHeight*0.86; break;
+        case 'PageUp': distance=-window.innerHeight*0.86; break;
+        case ' ': distance=event.shiftKey ? -window.innerHeight*0.86 : window.innerHeight*0.86; break;
+        case 'Home': target=0; break;
+        case 'End': target=maxScroll(); break;
+        default: return;
+      }
+      event.preventDefault();
+      if(distance) target=clamp(target+distance);
+      start();
+    }
+    window.addEventListener('wheel',onWheel,{passive:false});
+    window.addEventListener('keydown',onKeydown,{passive:false});
+    window.addEventListener('scroll',function(){
+      if(!active){ current=target=window.scrollY; }
+    },{passive:true});
+    window.addEventListener('resize',function(){ target=clamp(target); });
+  })();
   /* ---- RSVP form (Netlify Forms) ---- */
   (function(){
     var form=document.getElementById('rsvpForm'), status=document.getElementById('rsvpStatus'), done=document.getElementById('rsvpDone');
