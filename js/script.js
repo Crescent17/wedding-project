@@ -323,7 +323,7 @@
       image.classList.remove('is-dragging');
     });
   })();
-  /* ---- RSVP form (Netlify Forms) ---- */
+  /* ---- RSVP form (Telegram via Netlify Function) ---- */
   (function(){
     var form=document.getElementById('rsvpForm'), status=document.getElementById('rsvpStatus'), done=document.getElementById('rsvpDone');
     if(!form) return;
@@ -332,7 +332,7 @@
       e.preventDefault();
       if(!form.checkValidity()){ form.reportValidity(); return; }
       btn.disabled=true; status.textContent='Отправляем…';
-      fetch('/',{
+      fetch('/.netlify/functions/send-rsvp',{
         method:'POST',
         headers:{'Content-Type':'application/x-www-form-urlencoded'},
         body:new URLSearchParams(new FormData(form)).toString()
