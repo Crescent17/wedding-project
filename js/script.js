@@ -448,7 +448,7 @@
   })();
   /* ---- Gentle reveal of page sections ---- */
   (function(){
-    var selectors='.invite,.timeline,.venue,.dress,.details,.rsvp,.contacts,.countdown';
+    var selectors='.invite,.timeline,.venue,.dress,.details,.rsvp,.contacts,.countdown,.swatches';
     var sections=document.querySelectorAll(selectors);
     if(!sections.length || !('IntersectionObserver' in window) ||
        window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -504,5 +504,19 @@
     }
     tick();
     setInterval(tick,1000);
+  })();
+  /* ---- Add wedding date to calendar ---- */
+  (function(){
+    var timer=document.getElementById('timer'), button=document.getElementById('addToCalendar');
+    if(!timer||!button) return;
+    button.addEventListener('click',function(){
+      var start=new Date(timer.getAttribute('data-target'));
+      if(isNaN(start.getTime())) return;
+      var end=new Date(start.getTime()+4*60*60*1000);
+      var dates=start.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z')+'/'+end.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z');
+      var title=encodeURIComponent('Свадьба Никиты и Полины'), location=encodeURIComponent('Усадьба Lake View Villa, деревня Казаки, 23');
+      var url='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+title+'&dates='+dates+'&location='+location+'&details='+encodeURIComponent('Свадьба Никиты и Полины');
+      window.open(url,'_blank','noopener,noreferrer');
+    });
   })();
 })();
