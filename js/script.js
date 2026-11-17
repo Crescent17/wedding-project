@@ -523,8 +523,19 @@
         'DESCRIPTION:Свадьба Никиты и Полины','END:VEVENT','END:VCALENDAR'
       ].join('\r\n');
       var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'}), url=URL.createObjectURL(blob);
-      var userAgent=navigator.userAgent||'', isIOS=/iPhone|iPad|iPod/i.test(userAgent), isAndroid=/Android/i.test(userAgent);
-      if(isIOS){
+      var userAgent=navigator.userAgent||'', isIOS=/iPhone|iPad|iPod/i.test(userAgent), isAndroid=/Android/i.test(userAgent), isTelegram=/Telegram/i.test(userAgent);
+      function downloadIcs(){
+        var link=document.createElement('a');
+        link.href=url;
+        link.download='svadba-nikity-i-poliny.ics';
+        link.rel='noopener';
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(function(){ link.remove(); URL.revokeObjectURL(url); },1000);
+      }
+      if(isTelegram){
+        downloadIcs();
+      }else if(isIOS){
         window.location.href=url;
       }else if(isAndroid){
         var title=encodeURIComponent('Свадьба Никиты и Полины'), location=encodeURIComponent('Усадьба Lake View Villa, деревня Казаки, 23');
