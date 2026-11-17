@@ -523,13 +523,18 @@
         'DESCRIPTION:Свадьба Никиты и Полины','END:VEVENT','END:VCALENDAR'
       ].join('\r\n');
       var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'}), url=URL.createObjectURL(blob);
-      var isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent||'');
+      var userAgent=navigator.userAgent||'', isIOS=/iPhone|iPad|iPod/i.test(userAgent), isAndroid=/Android/i.test(userAgent);
       if(isIOS){
         window.location.href=url;
+      }else if(isAndroid){
+        var title=encodeURIComponent('Свадьба Никиты и Полины'), location=encodeURIComponent('Усадьба Lake View Villa, деревня Казаки, 23');
+        var systemIntent='intent://com.android.calendar/events#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.item/event;S.title='+title+';S.eventLocation='+location+';S.description='+encodeURIComponent('Свадьба Никиты и Полины')+';l.beginTime='+start.getTime()+';l.endTime='+end.getTime()+';end';
+        window.location.href=systemIntent;
       }else{
-        var link=document.createElement('a');
-        link.href=url; link.download='wedding-nikita-polina.ics'; link.click();
-        setTimeout(function(){ URL.revokeObjectURL(url); },1000);
+        var dates=start.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z')+'/'+end.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z');
+        var title=encodeURIComponent('Свадьба Никиты и Полины'), location=encodeURIComponent('Усадьба Lake View Villa, деревня Казаки, 23');
+        window.open('https://calendar.google.com/calendar/r/eventedit?text='+title+'&dates='+dates+'&location='+location+'&details='+encodeURIComponent('Свадьба Никиты и Полины'),'_blank','noopener,noreferrer');
+        URL.revokeObjectURL(url);
       }
     });
   })();
