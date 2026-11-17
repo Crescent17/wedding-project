@@ -127,7 +127,7 @@
       raf=requestAnimationFrame(frame);
     }
     function onWheel(event){
-      if(root.classList.contains('locked') || event.ctrlKey || !event.deltaY) return;
+      if(root.classList.contains('locked') || body.classList.contains('lightbox-open') || event.ctrlKey || !event.deltaY) return;
       event.preventDefault();
       if(!active){
         current=window.scrollY;
@@ -141,7 +141,7 @@
       return element && (element.isContentEditable || /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(element.tagName));
     }
     function onKeydown(event){
-      if(root.classList.contains('locked') || event.ctrlKey || event.altKey || event.metaKey || isEditable(document.activeElement)) return;
+      if(root.classList.contains('locked') || body.classList.contains('lightbox-open') || event.ctrlKey || event.altKey || event.metaKey || isEditable(document.activeElement)) return;
 
       if(!active){
         current=window.scrollY;
@@ -168,6 +168,106 @@
       if(!active){ current=target=window.scrollY; }
     },{passive:true});
     window.addEventListener('resize',function(){ target=clamp(target); });
+  })();
+  /* ---- Галерея дресс-кода ---- */
+  (function(){
+    var box=document.getElementById('dressLightbox'), image=document.getElementById('dressLightboxImage'),
+        title=document.getElementById('dressLightboxTitle'), counter=document.getElementById('dressLightboxCounter'),
+        zoom=document.getElementById('dressLightboxZoom');
+    if(!box||!image) return;
+    var activeLinks=[], index=0, lastFocus=null, closeTimer=0;
+    document.querySelectorAll('.dress-gallery').forEach(function(gallery){
+      var galleryLinks=Array.prototype.slice.call(gallery.querySelectorAll('.dress-photo-link'));
+      var previewIndex=0, isHovered=false;
+      galleryLinks[0].classList.add('is-preview-active');
+      function switchPreview(step){
+        previewIndex=(previewIndex+step+galleryLinks.length)%galleryLinks.length;
+        galleryLinks.forEach(function(link){
+          link.classList.remove('is-preview-active','is-preview-enter-next','is-preview-enter-prev');
+        });
+        var nextLink=galleryLinks[previewIndex], enterClass=step>0?'is-preview-enter-next':'is-preview-enter-prev';
+        nextLink.classList.add('is-preview-active',enterClass);
+        requestAnimationFrame(function(){
+          requestAnimationFrame(function(){ nextLink.classList.remove(enterClass); });
+        });
+      }
+      galleryLinks.forEach(function(link){
+        link.addEventListener('click',function(event){
+          event.preventDefault();
+          activeLinks=galleryLinks;
+          index=galleryLinks.indexOf(link);
+          open(link);
+        });
+      });
+      gallery.querySelectorAll('.dress-preview-control').forEach(function(control){
+        control.addEventListener('click',function(){
+          var step=Number(control.getAttribute('data-preview-step'));
+          switchPreview(step);
+        });
+      });
+      gallery.querySelector('.dress-gallery-grid').addEventListener('mouseenter',function(){ isHovered=true; });
+      gallery.querySelector('.dress-gallery-grid').addEventListener('mouseleave',function(){ isHovered=false; });
+      setInterval(function(){
+        if(!isHovered && !body.classList.contains('lightbox-open') && document.visibilityState==='visible') switchPreview(1);
+      },4000);
+    });
+    function open(link){
+      clearTimeout(closeTimer);
+      lastFocus=document.activeElement;
+      title.textContent=link.closest('.dress-gallery').querySelector('.dress-gallery-title').textContent;
+      box.hidden=false;
+      box.classList.remove('is-open');
+      body.classList.add('lightbox-open');
+      render();
+      requestAnimationFrame(function(){ box.classList.add('is-open'); });
+      box.querySelector('.dress-lightbox-close').focus();
+    }
+    function close(){
+      if(box.hidden) return;
+      box.classList.remove('is-open');
+      clearTimeout(closeTimer);
+      closeTimer=setTimeout(function(){
+        box.hidden=true;
+        body.classList.remove('lightbox-open');
+        if(lastFocus) lastFocus.focus();
+      },300);
+    }
+    function render(direction){
+      var img=activeLinks[index].querySelector('img');
+      image.classList.remove('is-changing','is-next','is-prev');
+      void image.offsetWidth;
+      image.classList.add('is-changing');
+      if(direction) image.classList.add(direction==='next'?'is-next':'is-prev');
+      image.src=img.src;
+      image.alt=img.alt;
+      image.classList.remove('is-zoomed');
+      zoom.setAttribute('aria-pressed','false');
+      zoom.setAttribute('aria-label','Увеличить фото');
+      counter.textContent=(index+1)+' из '+activeLinks.length;
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){ image.classList.remove('is-changing'); });
+      });
+    }
+    function move(step){
+      index=(index+step+activeLinks.length)%activeLinks.length;
+      title.textContent=activeLinks[index].closest('.dress-gallery').querySelector('.dress-gallery-title').textContent;
+      render(step>0?'next':'prev');
+    }
+    box.addEventListener('click',function(event){
+      if(event.target.closest('[data-lightbox-close]')) close();
+      else if(event.target.closest('.dress-lightbox-prev')) move(-1);
+      else if(event.target.closest('.dress-lightbox-next')) move(1);
+    });
+    box.addEventListener('keydown',function(event){
+      if(event.key==='Escape'){ event.preventDefault(); close(); }
+      else if(event.key==='ArrowLeft'){ event.preventDefault(); move(-1); }
+      else if(event.key==='ArrowRight'){ event.preventDefault(); move(1); }
+    });
+    zoom.addEventListener('click',function(){
+      var isZoomed=image.classList.toggle('is-zoomed');
+      zoom.setAttribute('aria-pressed',isZoomed?'true':'false');
+      zoom.setAttribute('aria-label',isZoomed?'Уменьшить фото':'Увеличить фото');
+    });
   })();
   /* ---- RSVP form (Netlify Forms) ---- */
   (function(){
