@@ -7,6 +7,70 @@
       seal=document.getElementById('seal'), main=document.getElementById('main');
   root.classList.add('locked');
 
+  /* ---- Living ambient background ---- */
+  (function(){
+    var ambient=document.getElementById('ambientBg');
+    if(!ambient || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var colors=['#777b56','#c9a87c','#a98f70'];
+    for(var i=0;i<9;i++){
+      var heart=document.createElement('i');
+      heart.className='ambient-heart';
+      heart.textContent='\u2665';
+      heart.style.setProperty('--heart-left',(5+Math.random()*90)+'%');
+      heart.style.setProperty('--heart-size',(14+Math.random()*17)+'px');
+      heart.style.setProperty('--heart-sway',((Math.random()-.5)*150)+'px');
+      heart.style.setProperty('--heart-duration',(12+Math.random()*9)+'s');
+      heart.style.setProperty('--heart-delay',(-Math.random()*18)+'s');
+      heart.style.setProperty('--heart-color',colors[i%colors.length]);
+      ambient.appendChild(heart);
+    }
+    var scrollTarget=0, scrollCurrent=0, frame=0;
+    function syncScroll(){
+      scrollTarget=Math.min(260,window.scrollY*.18);
+      if(frame) return;
+      frame=requestAnimationFrame(function animate(){
+        scrollCurrent+=(scrollTarget-scrollCurrent)*.12;
+        ambient.style.setProperty('--ambient-scroll',scrollCurrent.toFixed(2)+'px');
+        if(Math.abs(scrollTarget-scrollCurrent)>.1) frame=requestAnimationFrame(animate);
+        else { frame=0; scrollCurrent=scrollTarget; ambient.style.setProperty('--ambient-scroll',scrollCurrent.toFixed(2)+'px'); }
+      });
+    }
+    window.addEventListener('scroll',syncScroll,{passive:true});
+    syncScroll();
+
+    var lastScroll=window.scrollY, lastScatterAt=0, scatterQueued=false;
+    function scatter(){
+      scatterQueued=false;
+      if(Math.abs(window.scrollY-lastScroll)<6 || Date.now()-lastScatterAt<120) return;
+      lastScroll=window.scrollY;
+      lastScatterAt=Date.now();
+      var count=2+Math.floor(Math.random()*2);
+      for(var j=0;j<count;j++){
+        var flying=document.createElement('i');
+        flying.className='ambient-scroll-heart';
+        flying.textContent='\u2665';
+        flying.style.setProperty('--scroll-heart-left',(8+Math.random()*84)+'vw');
+        flying.style.setProperty('--scroll-heart-top',(12+Math.random()*72)+'vh');
+        flying.style.setProperty('--heart-size',(12+Math.random()*22)+'px');
+        flying.style.setProperty('--heart-scale',(0.85+Math.random()*.45).toFixed(2));
+        flying.style.setProperty('--heart-opacity',(0.62+Math.random()*.28).toFixed(2));
+        flying.style.setProperty('--scatter-x',((Math.random()-.5)*150)+'px');
+        flying.style.setProperty('--scatter-y',(-30-Math.random()*90)+'px');
+        flying.style.setProperty('--scatter-rotate',((Math.random()-.5)*50)+'deg');
+        flying.style.setProperty('--heart-duration',(1.15+Math.random()*.95)+'s');
+        flying.style.setProperty('--heart-color',colors[Math.floor(Math.random()*colors.length)]);
+        ambient.appendChild(flying);
+        setTimeout(function(node){ return function(){ node.remove(); }; }(flying),2200);
+      }
+    }
+    function onScrollScatter(){
+      if(scatterQueued) return;
+      scatterQueued=true;
+      requestAnimationFrame(scatter);
+    }
+    window.addEventListener('scroll',onScrollScatter,{passive:true});
+  })();
+
   var shown=false;
   function show(){
     if(shown) return; shown=true;
@@ -339,11 +403,52 @@
       }).then(function(r){
         if(!r.ok) throw new Error(r.status);
         form.hidden=true; done.hidden=false;
+        celebrate();
       }).catch(function(){
         status.textContent='Не получилось отправить. Попробуйте ещё раз.';
         btn.disabled=false;
       });
     });
+    function celebrate(){
+      if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var colors=['#777b56','#c9a56a','#fceebd','#533b2f','#dacdbd'];
+      for(var i=0;i<34;i++){
+        var piece=document.createElement('i');
+        piece.className='confetti-piece';
+        piece.style.setProperty('--confetti-x',(Math.random()*100)+'vw');
+        piece.style.setProperty('--confetti-drift',((Math.random()-.5)*180)+'px');
+        piece.style.setProperty('--confetti-rotate',(Math.random()*360)+'deg');
+        piece.style.setProperty('--confetti-duration',(1.5+Math.random()*1.2)+'s');
+        piece.style.setProperty('--confetti-color',colors[i%colors.length]);
+        piece.style.animationDelay=(Math.random()*.35)+'s';
+        document.body.appendChild(piece);
+        setTimeout(function(node){ return function(){ node.remove(); }; }(piece),2600);
+      }
+    }
+  })();
+  /* ---- Gentle reveal of page sections ---- */
+  (function(){
+    var selectors='.invite,.timeline,.venue,.dress,.details,.rsvp,.contacts,.countdown';
+    var sections=document.querySelectorAll(selectors);
+    if(!sections.length || !('IntersectionObserver' in window) ||
+       window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    sections.forEach(function(section,index){
+      section.classList.add('reveal-on-scroll');
+      if(index%4) section.classList.add('reveal-delay-'+(index%4));
+    });
+    document.querySelectorAll('.tl-item').forEach(function(item,index){
+      item.classList.add('reveal-on-scroll');
+      if(index%3) item.classList.add('reveal-delay-'+(index%3));
+    });
+    var observer=new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    },{threshold:.16,rootMargin:'0px 0px -8%'});
+    document.querySelectorAll('.reveal-on-scroll').forEach(function(element){ observer.observe(element); });
   })();
   /* ---- Countdown ---- */
   (function(){
@@ -361,7 +466,13 @@
     }
     function pad(n){ return n<10?'0'+n:String(n); }
     function set(unit,n){
-      box.querySelector('[data-num="'+unit+'"]').textContent=pad(n);
+      var number=box.querySelector('[data-num="'+unit+'"]'), next=pad(n);
+      if(number.textContent!==next){
+        number.textContent=next;
+        number.classList.remove('is-ticking');
+        void number.offsetWidth;
+        number.classList.add('is-ticking');
+      }
       box.querySelector('[data-label="'+unit+'"]').textContent=plural(n,words[unit]);
     }
     function tick(){
