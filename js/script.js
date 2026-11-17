@@ -534,7 +534,7 @@
         setTimeout(function(){ link.remove(); URL.revokeObjectURL(url); },1000);
       }
       if(isTelegram){
-        downloadIcs();
+        window.location.href='assets/wedding.ics';
       }else if(isIOS){
         window.location.href=url;
       }else if(isAndroid){
