@@ -107,9 +107,27 @@
   });
 
   var opened=false;
+  function releasePetals(){
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var colors=['#777b56','#c9a87c','#fceebd','#dacdbd'];
+    for(var i=0;i<24;i++){
+      var petal=document.createElement('i');
+      petal.className='opening-petal';
+      petal.style.setProperty('--petal-x',((Math.random()-.5)*Math.min(window.innerWidth*.95,520))+'px');
+      petal.style.setProperty('--petal-y',((Math.random()-.5)*Math.min(window.innerHeight*.9,700))+'px');
+      petal.style.setProperty('--petal-rotate',((Math.random()-.5)*720)+'deg');
+      petal.style.setProperty('--petal-scale',(0.7+Math.random()*.9).toFixed(2));
+      petal.style.setProperty('--petal-duration',(1.2+Math.random()*.8)+'s');
+      petal.style.setProperty('--petal-delay',(Math.random()*.18)+'s');
+      petal.style.setProperty('--petal-color',colors[i%colors.length]);
+      document.body.appendChild(petal);
+      setTimeout(function(node){ return function(){ node.remove(); }; }(petal),2300);
+    }
+  }
   seal.addEventListener('click',function(){
     if(opened) return; opened=true;
     startMusic(); /* запуск прямо по клику — так браузеры разрешают звук */
+    releasePetals();
     stage.classList.add('opening');
     body.classList.add('opening');
     setTimeout(function(){
