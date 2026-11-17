@@ -175,7 +175,8 @@
         title=document.getElementById('dressLightboxTitle'), counter=document.getElementById('dressLightboxCounter'),
         zoom=document.getElementById('dressLightboxZoom');
     if(!box||!image) return;
-    var activeLinks=[], index=0, lastFocus=null, closeTimer=0;
+    var activeLinks=[], index=0, lastFocus=null, closeTimer=0, zoomed=false, panX=0, panY=0,
+        dragging=false, dragMoved=false, dragStartX=0, dragStartY=0, dragPanX=0, dragPanY=0;
     document.querySelectorAll('.dress-gallery').forEach(function(gallery){
       var galleryLinks=Array.prototype.slice.call(gallery.querySelectorAll('.dress-photo-link'));
       var previewIndex=0, isHovered=false;
@@ -234,15 +235,13 @@
     }
     function render(direction){
       var img=activeLinks[index].querySelector('img');
+      resetZoom();
       image.classList.remove('is-changing','is-next','is-prev');
       void image.offsetWidth;
       image.classList.add('is-changing');
       if(direction) image.classList.add(direction==='next'?'is-next':'is-prev');
       image.src=img.src;
       image.alt=img.alt;
-      image.classList.remove('is-zoomed');
-      zoom.setAttribute('aria-pressed','false');
-      zoom.setAttribute('aria-label','Увеличить фото');
       counter.textContent=(index+1)+' из '+activeLinks.length;
       requestAnimationFrame(function(){
         requestAnimationFrame(function(){ image.classList.remove('is-changing'); });
@@ -263,10 +262,65 @@
       else if(event.key==='ArrowLeft'){ event.preventDefault(); move(-1); }
       else if(event.key==='ArrowRight'){ event.preventDefault(); move(1); }
     });
-    zoom.addEventListener('click',function(){
-      var isZoomed=image.classList.toggle('is-zoomed');
-      zoom.setAttribute('aria-pressed',isZoomed?'true':'false');
-      zoom.setAttribute('aria-label',isZoomed?'Уменьшить фото':'Увеличить фото');
+    function resetPan(){
+      panX=0; panY=0;
+      image.style.setProperty('--pan-x','0px');
+      image.style.setProperty('--pan-y','0px');
+    }
+    function resetZoom(){
+      zoomed=false; dragging=false; dragMoved=false;
+      resetPan();
+      image.classList.remove('is-zoomed','is-dragging');
+      zoom.setAttribute('aria-pressed','false');
+      zoom.setAttribute('aria-label','Увеличить фото');
+    }
+    function toggleZoom(){
+      zoomed=!zoomed;
+      if(!zoomed) resetPan();
+      image.classList.toggle('is-zoomed',zoomed);
+      zoom.setAttribute('aria-pressed',zoomed?'true':'false');
+      zoom.setAttribute('aria-label',zoomed?'Уменьшить фото':'Увеличить фото');
+    }
+    function limitPan(){
+      var content=image.parentElement;
+      var scale=1.5;
+      var maxX=Math.max(0,(image.clientWidth*scale-content.clientWidth)/2);
+      var maxY=Math.max(0,(image.clientHeight*scale-content.clientHeight)/2);
+      panX=Math.max(-maxX,Math.min(maxX,panX));
+      panY=Math.max(-maxY,Math.min(maxY,panY));
+      image.style.setProperty('--pan-x',panX+'px');
+      image.style.setProperty('--pan-y',panY+'px');
+    }
+    zoom.addEventListener('click',toggleZoom);
+    image.addEventListener('click',function(event){
+      if(dragMoved){ dragMoved=false; return; }
+      event.preventDefault();
+      toggleZoom();
+    });
+    image.addEventListener('pointerdown',function(event){
+      if(!zoomed) return;
+      dragging=true; dragMoved=false;
+      dragStartX=event.clientX; dragStartY=event.clientY;
+      dragPanX=panX; dragPanY=panY;
+      image.classList.add('is-dragging');
+      image.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    });
+    image.addEventListener('pointermove',function(event){
+      if(!dragging) return;
+      var dx=event.clientX-dragStartX, dy=event.clientY-dragStartY;
+      if(Math.abs(dx)>3||Math.abs(dy)>3) dragMoved=true;
+      panX=dragPanX+dx; panY=dragPanY+dy;
+      limitPan();
+    });
+    image.addEventListener('pointerup',function(event){
+      dragging=false;
+      image.classList.remove('is-dragging');
+      if(image.hasPointerCapture(event.pointerId)) image.releasePointerCapture(event.pointerId);
+    });
+    image.addEventListener('pointercancel',function(){
+      dragging=false;
+      image.classList.remove('is-dragging');
     });
   })();
   /* ---- RSVP form (Netlify Forms) ---- */

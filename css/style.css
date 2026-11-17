@@ -150,12 +150,13 @@ body.opening #main{opacity:1;transform:none}
 .dress-lightbox-close,.dress-lightbox-zoom{position:fixed;top:12px;z-index:3;display:grid;place-items:center;width:40px;height:40px;border:1px solid rgba(58,42,34,.08);border-radius:50%;background:rgba(255,255,255,.9);color:var(--ink);cursor:pointer}
 .dress-lightbox-close{right:12px;padding:0;font-size:30px;line-height:1}
 .dress-lightbox-zoom{right:62px;padding:0;font-size:26px;line-height:1}
-.dress-lightbox-content{display:flex;align-items:center;justify-content:center;width:100%;height:100%}
-.dress-lightbox-image{display:block;width:auto;height:auto;max-width:calc(100vw - 140px);max-height:calc(100svh - 28px);object-fit:contain;transition:opacity .42s ease,transform .42s cubic-bezier(.2,.7,.2,1)}
+.dress-lightbox-content{display:flex;align-items:center;justify-content:center;width:100%;height:100%;overflow:hidden}
+.dress-lightbox-image{display:block;width:auto;height:auto;max-width:calc(100vw - 140px);max-height:calc(100svh - 28px);object-fit:contain;cursor:zoom-in;touch-action:none;user-select:none;-webkit-user-drag:none;transition:opacity .42s ease,transform .42s cubic-bezier(.2,.7,.2,1)}
 .dress-lightbox-image.is-changing{opacity:0}
 .dress-lightbox-image.is-changing.is-next{transform:translateX(-48px) scale(.96)}
 .dress-lightbox-image.is-changing.is-prev{transform:translateX(48px) scale(.96)}
-.dress-lightbox-image.is-zoomed{max-width:none;max-height:none;transform:scale(1.5);cursor:zoom-out}
+.dress-lightbox-image.is-zoomed{max-width:calc(100vw - 140px);max-height:calc(100svh - 28px);transform:translate3d(var(--pan-x,0px),var(--pan-y,0px),0) scale(1.5);cursor:grab}
+.dress-lightbox-image.is-zoomed.is-dragging{cursor:grabbing;transition:none}
 .dress-lightbox-control{position:fixed;top:50%;z-index:3;display:grid;place-items:center;width:40px;height:40px;padding:0;border:1px solid rgba(58,42,34,.08);border-radius:50%;background:rgba(255,255,255,.9);color:var(--ink);font-size:0;cursor:pointer;transform:translateY(-50%)}
 .dress-lightbox-control:hover,.dress-lightbox-close:hover,.dress-lightbox-zoom:hover{background:#fff;border-color:rgba(58,42,34,.2)}
 .dress-lightbox-prev{left:12px}.dress-lightbox-next{right:12px}
